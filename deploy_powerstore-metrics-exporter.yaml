@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: powerstore-credentials
+type: Opaque
+data:
+  POWERSTORE_HOST: ""
+  POWERSTORE_USER: ""
+  POWERSTORE_PASS: ""
+  
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: powerstore-exporter-service
+spec:
+  selector:
+    app: powerstore-exporter-app
+  ports:
+  - protocol: "TCP"
+    port: 8125
+    targetPort: 8125
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: powerstore-exporter-app
+spec:
+  selector:
+    matchLabels:
+      app: powerstore-exporter-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: powerstore-exporter-app
+    spec:
+      containers:
+      - name: powerstore-exporter-app
+        image: 
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8125
+        env:
+          - name: POWERSTORE_HOST
+            valueFrom:
+              secretKeyRef:
+                name: powerstore-credentials
+                key: POWERSTORE_HOST
+          - name: POWERSTORE_USER
+            valueFrom:
+              secretKeyRef:
+                name: powerstore-credentials
+                key: POWERSTORE_USER
+          - name: POWERSTORE_PASS
+            valueFrom:
+              secretKeyRef:
+                name: powerstore-credentials
+                key: POWERSTORE_PASS
