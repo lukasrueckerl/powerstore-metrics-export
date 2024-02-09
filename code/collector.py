@@ -27,7 +27,7 @@ class PowerstoreCollector(object):
         if req.status_code != 200:
             print ("UNKNOWN ERROR: Can't connect to %s failed: %s" % (url, "error"))
 
-        result = req.json ()
+        result = req.json()
 
         if returnToken == True:
             result = req.headers['DELL-EMC-TOKEN']
